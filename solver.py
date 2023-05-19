@@ -3,8 +3,8 @@ import networkx as nx
 import torch
 from queue import Queue
 from tqdm import tqdm
-from utils import add_vertex_cost_to_edge
-from graph import replace_subgraph, Segment, parse_computation_graph
+from .utils import add_vertex_cost_to_edge
+from .graph import replace_subgraph, Segment, parse_computation_graph
 
 
 def optimal_grad_checkpointing(net, input):
@@ -15,6 +15,9 @@ def optimal_grad_checkpointing(net, input):
     '''
     net.train()
     inputs = [input]
+    G, source, target = parse_computation_graph(net, inputs)
+
+    """ 
     try:
         G, source, target = parse_computation_graph(net, inputs)
     except:
@@ -23,6 +26,7 @@ def optimal_grad_checkpointing(net, input):
             raise Exception("net.parse_graph(input) function needs to be provided")
         with torch.no_grad():
             G, source, target = net.parse_graph(input)
+    """
 
     solver = ArbitrarySolver()
 

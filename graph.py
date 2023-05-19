@@ -4,7 +4,7 @@ from queue import Queue
 import networkx as nx
 import torch
 import torch.nn.functional as F
-from net.layer import TupleConstruct, TupleIndexing, Mul2, Add2, BasicIdentity, Cat, ListConstruct, Flatten, View, FunctionWrapperV2
+from .net.layer import TupleConstruct, TupleIndexing, Mul2, Add2, BasicIdentity, Cat, ListConstruct, Flatten, View, FunctionWrapperV2
 from copy import deepcopy
 
 # todo: get shapes of all the tensors when tracing
@@ -157,7 +157,10 @@ def parse_node_str(node_str):
                 node_dict[node_name] = {'node_class': node_class, 'node_op': node_op, 'output_id': i}
                 if node_class == 'Tensor' and '(' in node_type and ')' in node_type:
                     # try to get shape
-                    shape_str = node_type.split('(')[-1].split(')')[0]
+                    if 'strides' in node_type:
+                        shape_str = node_type.split('(')[-1].split(', strides')[0]
+                    else:
+                        shape_str = node_type.split('(')[-1].split(')')[0]
                     if ', ' in shape_str:
                         shape = [int(s) for s in shape_str.split(', ')]
                         node_dict[node_name]['shape'] = shape
